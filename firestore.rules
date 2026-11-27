@@ -1,0 +1,770 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'adamskipkoechk@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isStringWithRange(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isOptionalString(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    function isBoundedStringList(data, key, maxItems) {
+      return !(key in data) || (
+        data[key] is list &&
+        data[key].size() <= maxItems &&
+        (data[key].size() == 0 || data[key][0] is string)
+      );
+    }
+
+    // --- Validation Helpers ---
+    function isValidUserAccount(data) {
+      return data.keys().hasAll(['uid', 'email', 'fullName', 'role', 'onboardingCompleted', 'isSuspended', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly([
+          'uid', 'email', 'fullName', 'phone', 'photoUrl', 'role', 'city', 'area',
+          'country', 'preferredCurrency', 'savedAddresses', 'servicePreferences',
+          'notificationPrefs', 'onboardingCompleted', 'isSuspended', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.uid) &&
+        isStringWithRange(data.email, 3, 254) &&
+        isStringWithRange(data.fullName, 1, 120) &&
+        data.role in ['customer', 'provider', 'admin'] &&
+        data.onboardingCompleted is bool &&
+        data.isSuspended is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp &&
+        isOptionalString(data, 'phone', 32) &&
+        isOptionalString(data, 'photoUrl', 512) &&
+        isOptionalString(data, 'city', 80) &&
+        isOptionalString(data, 'area', 100) &&
+        isOptionalString(data, 'country', 64) &&
+        isOptionalString(data, 'preferredCurrency', 8) &&
+        isBoundedStringList(data, 'servicePreferences', 20) &&
+        (!('savedAddresses' in data) || (data.savedAddresses is list && data.savedAddresses.size() <= 10)) &&
+        (!('notificationPrefs' in data) || data.notificationPrefs is map);
+    }
+
+    function isValidAdminMember(data) {
+      return data.keys().hasAll(['uid', 'email', 'grantedBy', 'createdAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'grantedBy', 'createdAt']) &&
+        isValidId(data.uid) &&
+        isStringWithRange(data.email, 3, 254) &&
+        isStringWithRange(data.grantedBy, 1, 128) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['slug', 'name', 'description', 'iconName', 'sortOrder', 'isActive', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['slug', 'name', 'description', 'iconName', 'imageUrl', 'sortOrder', 'isActive', 'subcategories', 'createdAt', 'updatedAt']) &&
+        isStringWithRange(data.slug, 2, 80) &&
+        data.slug.matches('^[a-z0-9\\-]+$') &&
+        isStringWithRange(data.name, 2, 100) &&
+        isStringWithRange(data.description, 2, 400) &&
+        isStringWithRange(data.iconName, 1, 60) &&
+        isOptionalString(data, 'imageUrl', 512) &&
+        data.sortOrder is number &&
+        data.isActive is bool &&
+        isBoundedStringList(data, 'subcategories', 25) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidProviderProfile(data) {
+      return data.keys().hasAll([
+          'uid', 'slug', 'displayName', 'providerType', 'city', 'verificationStatus',
+          'identityVerified', 'phoneVerified', 'businessVerified', 'credentialsVerified',
+          'subscriptionTier', 'isSponsored', 'isSuspended', 'avgRating', 'reviewCount',
+          'completedJobsCount', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'uid', 'slug', 'displayName', 'businessName', 'providerType', 'bio', 'city',
+          'serviceAreas', 'categories', 'languages', 'yearsExperience', 'startingPrice',
+          'photoUrl', 'portfolioUrls', 'workingHours', 'emergencyAvailable', 'availableToday',
+          'verificationStatus', 'identityVerified', 'phoneVerified', 'businessVerified',
+          'credentialsVerified', 'subscriptionTier', 'isSponsored', 'isSuspended',
+          'avgRating', 'reviewCount', 'completedJobsCount', 'profileViews', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.uid) &&
+        isStringWithRange(data.slug, 2, 120) &&
+        isStringWithRange(data.displayName, 1, 120) &&
+        isOptionalString(data, 'businessName', 140) &&
+        data.providerType in ['individual', 'business'] &&
+        isOptionalString(data, 'bio', 1500) &&
+        isStringWithRange(data.city, 1, 80) &&
+        isBoundedStringList(data, 'serviceAreas', 20) &&
+        isBoundedStringList(data, 'categories', 10) &&
+        isBoundedStringList(data, 'languages', 10) &&
+        (!('yearsExperience' in data) || (data.yearsExperience is number && data.yearsExperience >= 0 && data.yearsExperience <= 80)) &&
+        (!('startingPrice' in data) || (data.startingPrice is number && data.startingPrice >= 0)) &&
+        isOptionalString(data, 'photoUrl', 512) &&
+        isBoundedStringList(data, 'portfolioUrls', 12) &&
+        (!('workingHours' in data) || data.workingHours is map) &&
+        (!('emergencyAvailable' in data) || data.emergencyAvailable is bool) &&
+        (!('availableToday' in data) || data.availableToday is bool) &&
+        data.verificationStatus in ['not_submitted', 'pending_review', 'approved', 'rejected', 'additional_info_required', 'suspended'] &&
+        data.identityVerified is bool &&
+        data.phoneVerified is bool &&
+        data.businessVerified is bool &&
+        data.credentialsVerified is bool &&
+        data.subscriptionTier in ['free', 'pro', 'business'] &&
+        data.isSponsored is bool &&
+        data.isSuspended is bool &&
+        data.avgRating is number && data.avgRating >= 0 && data.avgRating <= 5 &&
+        data.reviewCount is number && data.reviewCount >= 0 &&
+        data.completedJobsCount is number && data.completedJobsCount >= 0 &&
+        (!('profileViews' in data) || (data.profileViews is number && data.profileViews >= 0)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidProviderVerificationPrivate(data) {
+      return data.keys().hasAll(['uid', 'idDocumentLabel', 'submittedAt', 'updatedAt']) &&
+        data.keys().hasOnly([
+          'uid', 'nationalIdLast4', 'idDocumentLabel', 'businessRegNumber',
+          'qualificationsSummary', 'certificationsList', 'adminReviewNotes',
+          'reviewedBy', 'submittedAt', 'updatedAt'
+        ]) &&
+        isValidId(data.uid) &&
+        isOptionalString(data, 'nationalIdLast4', 12) &&
+        isStringWithRange(data.idDocumentLabel, 1, 200) &&
+        isOptionalString(data, 'businessRegNumber', 80) &&
+        isOptionalString(data, 'qualificationsSummary', 1000) &&
+        isBoundedStringList(data, 'certificationsList', 15) &&
+        isOptionalString(data, 'adminReviewNotes', 1000) &&
+        isOptionalString(data, 'reviewedBy', 128) &&
+        data.submittedAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidServiceListing(data) {
+      return data.keys().hasAll([
+          'providerId', 'providerName', 'categorySlug', 'categoryName', 'title',
+          'description', 'pricingModel', 'price', 'currency', 'city', 'status',
+          'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'providerId', 'providerName', 'categorySlug', 'categoryName', 'title',
+          'description', 'pricingModel', 'price', 'currency', 'estimatedDurationMins',
+          'city', 'serviceAreas', 'terms', 'status', 'isSponsored', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.providerId) &&
+        isStringWithRange(data.providerName, 1, 140) &&
+        isStringWithRange(data.categorySlug, 2, 80) &&
+        isStringWithRange(data.categoryName, 2, 100) &&
+        isStringWithRange(data.title, 3, 140) &&
+        isStringWithRange(data.description, 10, 1500) &&
+        data.pricingModel in ['fixed', 'starting_at', 'hourly', 'per_unit', 'quote'] &&
+        data.price is number && data.price >= 0 &&
+        isStringWithRange(data.currency, 1, 8) &&
+        (!('estimatedDurationMins' in data) || (data.estimatedDurationMins is number && data.estimatedDurationMins > 0)) &&
+        isStringWithRange(data.city, 1, 80) &&
+        isBoundedStringList(data, 'serviceAreas', 20) &&
+        isOptionalString(data, 'terms', 800) &&
+        data.status in ['active', 'paused', 'archived'] &&
+        (!('isSponsored' in data) || data.isSponsored is bool) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll([
+          'referenceCode', 'customerId', 'customerName', 'providerId', 'providerName',
+          'serviceTitle', 'bookingType', 'jobDescription', 'city', 'area',
+          'scheduledDate', 'scheduledTime', 'price', 'currency', 'paymentMethod',
+          'paymentStatus', 'status', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'referenceCode', 'customerId', 'customerName', 'providerId', 'providerName',
+          'serviceId', 'serviceTitle', 'categorySlug', 'bookingType', 'jobDescription',
+          'city', 'area', 'exactAddress', 'scheduledDate', 'scheduledTime', 'price',
+          'commissionAmount', 'currency', 'paymentMethod', 'paymentStatus', 'status',
+          'quotationNotes', 'quotationItems', 'quotationExpiry', 'estimatedDuration',
+          'cancellationReason', 'createdAt', 'updatedAt'
+        ]) &&
+        isStringWithRange(data.referenceCode, 6, 32) &&
+        isValidId(data.customerId) &&
+        isStringWithRange(data.customerName, 1, 120) &&
+        isValidId(data.providerId) &&
+        data.customerId != data.providerId &&
+        isStringWithRange(data.providerName, 1, 140) &&
+        isOptionalString(data, 'serviceId', 128) &&
+        isStringWithRange(data.serviceTitle, 2, 140) &&
+        isOptionalString(data, 'categorySlug', 80) &&
+        data.bookingType in ['direct', 'quote'] &&
+        isStringWithRange(data.jobDescription, 5, 2000) &&
+        isStringWithRange(data.city, 1, 80) &&
+        isStringWithRange(data.area, 1, 100) &&
+        isOptionalString(data, 'exactAddress', 300) &&
+        isStringWithRange(data.scheduledDate, 4, 20) &&
+        isStringWithRange(data.scheduledTime, 2, 20) &&
+        data.price is number && data.price >= 0 &&
+        (!('commissionAmount' in data) || (data.commissionAmount is number && data.commissionAmount >= 0)) &&
+        isStringWithRange(data.currency, 1, 8) &&
+        data.paymentMethod in ['mpesa_pending', 'cash_outside_platform', 'bank_transfer', 'card_pending'] &&
+        data.paymentStatus in ['unpaid', 'awaiting_confirmation', 'paid_outside_platform', 'refunded'] &&
+        data.status in [
+          'requested', 'awaiting_quotation', 'quotation_sent', 'awaiting_customer_approval',
+          'confirmed', 'provider_en_route', 'in_progress', 'completed', 'cancelled', 'disputed'
+        ] &&
+        isOptionalString(data, 'quotationNotes', 1500) &&
+        (!('quotationItems' in data) || (data.quotationItems is list && data.quotationItems.size() <= 10)) &&
+        isOptionalString(data, 'quotationExpiry', 40) &&
+        isOptionalString(data, 'estimatedDuration', 80) &&
+        isOptionalString(data, 'cancellationReason', 500) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidBookingMessage(data) {
+      return data.keys().hasAll(['senderId', 'senderName', 'senderRole', 'body', 'readByCustomer', 'readByProvider', 'createdAt']) &&
+        data.keys().hasOnly(['senderId', 'senderName', 'senderRole', 'body', 'readByCustomer', 'readByProvider', 'createdAt']) &&
+        isValidId(data.senderId) &&
+        isStringWithRange(data.senderName, 1, 120) &&
+        data.senderRole in ['customer', 'provider', 'admin'] &&
+        isStringWithRange(data.body, 1, 2000) &&
+        data.readByCustomer is bool &&
+        data.readByProvider is bool &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll([
+          'bookingId', 'customerId', 'customerName', 'providerId', 'overallRating',
+          'professionalism', 'quality', 'punctuality', 'communication', 'comment',
+          'isReported', 'isHidden', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'bookingId', 'customerId', 'customerName', 'providerId', 'serviceTitle',
+          'overallRating', 'professionalism', 'quality', 'punctuality', 'communication',
+          'comment', 'providerResponse', 'isReported', 'reportReason', 'isHidden',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.bookingId) &&
+        isValidId(data.customerId) &&
+        isStringWithRange(data.customerName, 1, 120) &&
+        isValidId(data.providerId) &&
+        data.customerId != data.providerId &&
+        isOptionalString(data, 'serviceTitle', 140) &&
+        data.overallRating is number && data.overallRating >= 1 && data.overallRating <= 5 &&
+        data.professionalism is number && data.professionalism >= 1 && data.professionalism <= 5 &&
+        data.quality is number && data.quality >= 1 && data.quality <= 5 &&
+        data.punctuality is number && data.punctuality >= 1 && data.punctuality <= 5 &&
+        data.communication is number && data.communication >= 1 && data.communication <= 5 &&
+        isStringWithRange(data.comment, 5, 1500) &&
+        isOptionalString(data, 'providerResponse', 1000) &&
+        data.isReported is bool &&
+        isOptionalString(data, 'reportReason', 400) &&
+        data.isHidden is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidFavorite(data) {
+      return data.keys().hasAll(['customerId', 'providerId', 'createdAt']) &&
+        data.keys().hasOnly(['customerId', 'providerId', 'providerName', 'createdAt']) &&
+        isValidId(data.customerId) &&
+        isValidId(data.providerId) &&
+        isOptionalString(data, 'providerName', 140) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['userId', 'title', 'body', 'type', 'isRead', 'createdAt']) &&
+        data.keys().hasOnly(['userId', 'title', 'body', 'type', 'link', 'isRead', 'createdAt']) &&
+        isValidId(data.userId) &&
+        isStringWithRange(data.title, 1, 140) &&
+        isStringWithRange(data.body, 1, 400) &&
+        data.type in ['booking', 'quote', 'message', 'review', 'verification', 'dispute', 'system'] &&
+        isOptionalString(data, 'link', 200) &&
+        data.isRead is bool &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidDispute(data) {
+      return data.keys().hasAll(['bookingId', 'customerId', 'providerId', 'openedBy', 'reason', 'description', 'status', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly([
+          'bookingId', 'bookingReference', 'customerId', 'providerId', 'openedBy',
+          'reason', 'description', 'providerResponse', 'status', 'resolutionNotes',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.bookingId) &&
+        isOptionalString(data, 'bookingReference', 32) &&
+        isValidId(data.customerId) &&
+        isValidId(data.providerId) &&
+        isValidId(data.openedBy) &&
+        isStringWithRange(data.reason, 3, 200) &&
+        isStringWithRange(data.description, 10, 2000) &&
+        isOptionalString(data, 'providerResponse', 1500) &&
+        data.status in ['open', 'under_investigation', 'awaiting_response', 'resolved', 'closed'] &&
+        isOptionalString(data, 'resolutionNotes', 1500) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPlatformSettings(data) {
+      return data.keys().hasAll(['commissionRatePercent', 'defaultCurrency', 'defaultTimezone', 'supportedCities', 'mpesaStatus', 'updatedAt']) &&
+        data.keys().hasOnly(['commissionRatePercent', 'defaultCurrency', 'defaultTimezone', 'supportedCities', 'supportedCountries', 'mpesaStatus', 'subscriptionPlans', 'updatedAt']) &&
+        data.commissionRatePercent is number && data.commissionRatePercent >= 0 && data.commissionRatePercent <= 50 &&
+        isStringWithRange(data.defaultCurrency, 1, 8) &&
+        isStringWithRange(data.defaultTimezone, 1, 64) &&
+        isBoundedStringList(data, 'supportedCities', 50) &&
+        isBoundedStringList(data, 'supportedCountries', 30) &&
+        data.mpesaStatus in ['not_configured', 'sandbox_ready', 'live'] &&
+        (!('subscriptionPlans' in data) || (data.subscriptionPlans is list && data.subscriptionPlans.size() <= 10)) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidAuditLog(data) {
+      return data.keys().hasAll(['actorUid', 'action', 'targetType', 'targetId', 'createdAt']) &&
+        data.keys().hasOnly(['actorUid', 'actorEmail', 'action', 'targetType', 'targetId', 'details', 'createdAt']) &&
+        isValidId(data.actorUid) &&
+        isOptionalString(data, 'actorEmail', 254) &&
+        isStringWithRange(data.action, 2, 120) &&
+        isStringWithRange(data.targetType, 1, 60) &&
+        isStringWithRange(data.targetId, 1, 128) &&
+        isOptionalString(data, 'details', 1000) &&
+        data.createdAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+
+    // Startup connection check document
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // Users (PII isolated: owner or admin only)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isValidId(userId) && isVerifiedUser() && isValidUserAccount(incoming()) &&
+        incoming().uid == request.auth.uid &&
+        userId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        incoming().isSuspended == false &&
+        (incoming().role in ['customer', 'provider'] || isAdmin());
+      allow update: if isValidId(userId) && isVerifiedUser() && isValidUserAccount(incoming()) && (
+        isAdmin() ||
+        (
+          isOwner(userId) &&
+          incoming().uid == existing().uid &&
+          incoming().email == existing().email &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().isSuspended == existing().isSuspended &&
+          (incoming().role == existing().role || (existing().role == 'customer' && incoming().role == 'provider')) &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'fullName', 'phone', 'photoUrl', 'role', 'city', 'area', 'country',
+            'preferredCurrency', 'savedAddresses', 'servicePreferences',
+            'notificationPrefs', 'onboardingCompleted', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isValidId(userId) && (isOwner(userId) || isAdmin());
+    }
+
+    // Admin registry
+    match /admins/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isValidId(userId) && isAdmin() && (
+        request.method == 'delete' ||
+        (isValidAdminMember(incoming()) && incoming().createdAt == request.time)
+      );
+    }
+
+    // Service categories
+    match /categories/{categoryId} {
+      allow get: if isValidId(categoryId);
+      allow list: if true;
+      allow create: if isValidId(categoryId) && isAdmin() && isValidCategory(incoming()) &&
+        incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isValidId(categoryId) && isAdmin() && isValidCategory(incoming()) &&
+        incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time;
+      allow delete: if isValidId(categoryId) && isAdmin();
+    }
+
+    // Provider public profiles
+    match /providers/{providerId} {
+      allow get: if isValidId(providerId);
+      allow list: if true;
+      allow create: if isValidId(providerId) && isVerifiedUser() && isValidProviderProfile(incoming()) &&
+        providerId == request.auth.uid &&
+        incoming().uid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        incoming().identityVerified == false &&
+        incoming().businessVerified == false &&
+        incoming().credentialsVerified == false &&
+        incoming().isSponsored == false &&
+        incoming().isSuspended == false &&
+        incoming().avgRating == 0 &&
+        incoming().reviewCount == 0 &&
+        incoming().completedJobsCount == 0 &&
+        incoming().verificationStatus in ['not_submitted', 'pending_review'];
+      allow update: if isValidId(providerId) && isVerifiedUser() && isValidProviderProfile(incoming()) && (
+        isAdmin() ||
+        (
+          isOwner(providerId) &&
+          incoming().uid == existing().uid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          incoming().identityVerified == existing().identityVerified &&
+          incoming().businessVerified == existing().businessVerified &&
+          incoming().credentialsVerified == existing().credentialsVerified &&
+          incoming().isSponsored == existing().isSponsored &&
+          incoming().isSuspended == existing().isSuspended &&
+          incoming().avgRating == existing().avgRating &&
+          incoming().reviewCount == existing().reviewCount &&
+          incoming().completedJobsCount == existing().completedJobsCount &&
+          (
+            incoming().verificationStatus == existing().verificationStatus ||
+            (existing().verificationStatus in ['not_submitted', 'rejected', 'additional_info_required'] && incoming().verificationStatus == 'pending_review')
+          ) &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'slug', 'displayName', 'businessName', 'providerType', 'bio', 'city',
+            'serviceAreas', 'categories', 'languages', 'yearsExperience', 'startingPrice',
+            'photoUrl', 'portfolioUrls', 'workingHours', 'emergencyAvailable',
+            'availableToday', 'verificationStatus', 'phoneVerified', 'subscriptionTier',
+            'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isValidId(providerId) && isAdmin();
+
+      // Protected provider verification documents
+      match /private/verification {
+        allow get: if isValidId(providerId) && (isOwner(providerId) || isAdmin());
+        allow create: if isValidId(providerId) && isVerifiedUser() && isOwner(providerId) &&
+          isValidProviderVerificationPrivate(incoming()) &&
+          incoming().uid == request.auth.uid &&
+          incoming().submittedAt == request.time &&
+          incoming().updatedAt == request.time &&
+          !('adminReviewNotes' in incoming()) &&
+          !('reviewedBy' in incoming());
+        allow update: if isValidId(providerId) && isVerifiedUser() &&
+          isValidProviderVerificationPrivate(incoming()) && (
+            isAdmin() ||
+            (
+              isOwner(providerId) &&
+              incoming().uid == existing().uid &&
+              incoming().submittedAt == existing().submittedAt &&
+              incoming().updatedAt == request.time &&
+              incoming().diff(existing()).affectedKeys().hasOnly([
+                'nationalIdLast4', 'idDocumentLabel', 'businessRegNumber',
+                'qualificationsSummary', 'certificationsList', 'updatedAt'
+              ])
+            )
+          );
+      }
+    }
+
+    // Service listings
+    match /services/{serviceId} {
+      allow get: if isValidId(serviceId);
+      allow list: if true;
+      allow create: if isValidId(serviceId) && isVerifiedUser() && isValidServiceListing(incoming()) &&
+        incoming().providerId == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        (!('isSponsored' in incoming()) || incoming().isSponsored == false);
+      allow update: if isValidId(serviceId) && isVerifiedUser() && isValidServiceListing(incoming()) && (
+        isAdmin() ||
+        (
+          existing().providerId == request.auth.uid &&
+          incoming().providerId == existing().providerId &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (!('isSponsored' in incoming()) || incoming().isSponsored == existing().get('isSponsored', false)) &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'providerName', 'categorySlug', 'categoryName', 'title', 'description',
+            'pricingModel', 'price', 'currency', 'estimatedDurationMins', 'city',
+            'serviceAreas', 'terms', 'status', 'updatedAt'
+          ])
+        )
+      );
+      allow delete: if isValidId(serviceId) && isVerifiedUser() && (existing().providerId == request.auth.uid || isAdmin());
+    }
+
+    // Bookings & Quotations
+    match /bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && isSignedIn() && (
+        isAdmin() ||
+        existing().customerId == request.auth.uid ||
+        existing().providerId == request.auth.uid
+      );
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.customerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid
+      );
+      allow create: if isValidId(bookingId) && isVerifiedUser() && isValidBooking(incoming()) &&
+        incoming().customerId == request.auth.uid &&
+        exists(/databases/$(database)/documents/providers/$(incoming().providerId)) &&
+        incoming().status in ['requested', 'awaiting_quotation'] &&
+        incoming().paymentStatus == 'unpaid' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(bookingId) && isVerifiedUser() && isValidBooking(incoming()) && (
+        isAdmin() ||
+        // Customer actions (locked once completed or cancelled)
+        (
+          existing().customerId == request.auth.uid &&
+          !(existing().status in ['completed', 'cancelled']) &&
+          incoming().customerId == existing().customerId &&
+          incoming().providerId == existing().providerId &&
+          incoming().referenceCode == existing().referenceCode &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (
+            // Accept or decline quote
+            (existing().status in ['quotation_sent', 'awaiting_customer_approval'] &&
+             incoming().status in ['confirmed', 'cancelled'] &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['status', 'cancellationReason', 'updatedAt'])) ||
+            // Cancel pending booking
+            (existing().status in ['requested', 'awaiting_quotation', 'confirmed'] &&
+             incoming().status == 'cancelled' &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['status', 'cancellationReason', 'updatedAt'])) ||
+            // Open dispute
+            (existing().status in ['in_progress', 'confirmed'] &&
+             incoming().status == 'disputed' &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+            // Update payment method choice before payment
+            (incoming().status == existing().status &&
+             incoming().paymentStatus == 'awaiting_confirmation' &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['paymentMethod', 'paymentStatus', 'updatedAt']))
+          )
+        ) ||
+        // Provider actions (locked once completed or cancelled)
+        (
+          existing().providerId == request.auth.uid &&
+          !(existing().status in ['completed', 'cancelled']) &&
+          incoming().customerId == existing().customerId &&
+          incoming().providerId == existing().providerId &&
+          incoming().referenceCode == existing().referenceCode &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (
+            // Submit quotation
+            (existing().status in ['awaiting_quotation', 'requested'] &&
+             incoming().status == 'quotation_sent' &&
+             incoming().diff(existing()).affectedKeys().hasOnly([
+               'status', 'price', 'quotationNotes', 'quotationItems',
+               'quotationExpiry', 'estimatedDuration', 'updatedAt'
+             ])) ||
+            // Progress booking lifecycle
+            (incoming().status in ['confirmed', 'provider_en_route', 'in_progress', 'completed', 'cancelled'] &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['status', 'cancellationReason', 'updatedAt'])) ||
+            // Confirm payment received outside platform
+            (incoming().status == existing().status &&
+             incoming().paymentStatus == 'paid_outside_platform' &&
+             incoming().diff(existing()).affectedKeys().hasOnly(['paymentStatus', 'updatedAt']))
+          )
+        )
+      );
+      allow delete: if isValidId(bookingId) && isAdmin();
+
+      // Booking-linked 1-to-1 messaging (Master Gate on parent booking)
+      match /messages/{messageId} {
+        allow get: if isValidId(bookingId) && isValidId(messageId) && isSignedIn() && (
+          isAdmin() ||
+          get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerId == request.auth.uid ||
+          get(/databases/$(database)/documents/bookings/$(bookingId)).data.providerId == request.auth.uid
+        );
+        allow list: if isValidId(bookingId) && isSignedIn() && (
+          isAdmin() ||
+          get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerId == request.auth.uid ||
+          get(/databases/$(database)/documents/bookings/$(bookingId)).data.providerId == request.auth.uid
+        );
+        allow create: if isValidId(bookingId) && isValidId(messageId) && isVerifiedUser() &&
+          isValidBookingMessage(incoming()) &&
+          incoming().senderId == request.auth.uid &&
+          incoming().createdAt == request.time && (
+            isAdmin() ||
+            get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerId == request.auth.uid ||
+            get(/databases/$(database)/documents/bookings/$(bookingId)).data.providerId == request.auth.uid
+          );
+        allow update: if isValidId(bookingId) && isValidId(messageId) && isVerifiedUser() &&
+          isValidBookingMessage(incoming()) &&
+          incoming().senderId == existing().senderId &&
+          incoming().body == existing().body &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().diff(existing()).affectedKeys().hasOnly(['readByCustomer', 'readByProvider']) && (
+            get(/databases/$(database)/documents/bookings/$(bookingId)).data.customerId == request.auth.uid ||
+            get(/databases/$(database)/documents/bookings/$(bookingId)).data.providerId == request.auth.uid
+          );
+      }
+    }
+
+    // Verified reviews (1-to-1 with completed booking ID)
+    match /reviews/{reviewId} {
+      allow get: if isValidId(reviewId);
+      allow list: if true;
+      allow create: if isValidId(reviewId) && isVerifiedUser() && isValidReview(incoming()) &&
+        reviewId == incoming().bookingId &&
+        incoming().customerId == request.auth.uid &&
+        incoming().isReported == false &&
+        incoming().isHidden == false &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/bookings/$(incoming().bookingId)) &&
+        get(/databases/$(database)/documents/bookings/$(incoming().bookingId)).data.customerId == request.auth.uid &&
+        get(/databases/$(database)/documents/bookings/$(incoming().bookingId)).data.providerId == incoming().providerId &&
+        get(/databases/$(database)/documents/bookings/$(incoming().bookingId)).data.status == 'completed';
+      allow update: if isValidId(reviewId) && isVerifiedUser() && isValidReview(incoming()) &&
+        incoming().bookingId == existing().bookingId &&
+        incoming().customerId == existing().customerId &&
+        incoming().providerId == existing().providerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() ||
+          // Provider response
+          (existing().providerId == request.auth.uid &&
+           incoming().diff(existing()).affectedKeys().hasOnly(['providerResponse', 'updatedAt'])) ||
+          // Customer edit
+          (existing().customerId == request.auth.uid &&
+           incoming().diff(existing()).affectedKeys().hasOnly([
+             'overallRating', 'professionalism', 'quality', 'punctuality',
+             'communication', 'comment', 'updatedAt'
+           ])) ||
+          // Report inappropriate review
+          (incoming().isReported == true &&
+           incoming().diff(existing()).affectedKeys().hasOnly(['isReported', 'reportReason', 'updatedAt']))
+        );
+      allow delete: if isValidId(reviewId) && isAdmin();
+    }
+
+    // Customer favorites
+    match /favorites/{favoriteId} {
+      allow get: if isValidId(favoriteId) && isSignedIn() && existing().customerId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.customerId == request.auth.uid;
+      allow create: if isValidId(favoriteId) && isVerifiedUser() && isValidFavorite(incoming()) &&
+        incoming().customerId == request.auth.uid &&
+        incoming().createdAt == request.time;
+      allow delete: if isValidId(favoriteId) && isSignedIn() && existing().customerId == request.auth.uid;
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow get: if isValidId(notificationId) && isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isValidId(notificationId) && isVerifiedUser() && isValidNotification(incoming()) &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(notificationId) && isVerifiedUser() && isValidNotification(incoming()) &&
+        existing().userId == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['isRead']);
+      allow delete: if isValidId(notificationId) && isSignedIn() && (existing().userId == request.auth.uid || isAdmin());
+    }
+
+    // Disputes
+    match /disputes/{disputeId} {
+      allow get: if isValidId(disputeId) && isSignedIn() && (
+        isAdmin() ||
+        existing().customerId == request.auth.uid ||
+        existing().providerId == request.auth.uid
+      );
+      allow list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.customerId == request.auth.uid ||
+        resource.data.providerId == request.auth.uid
+      );
+      allow create: if isValidId(disputeId) && isVerifiedUser() && isValidDispute(incoming()) &&
+        incoming().openedBy == request.auth.uid &&
+        incoming().status == 'open' &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/bookings/$(incoming().bookingId)) && (
+          get(/databases/$(database)/documents/bookings/$(incoming().bookingId)).data.customerId == request.auth.uid ||
+          get(/databases/$(database)/documents/bookings/$(incoming().bookingId)).data.providerId == request.auth.uid
+        );
+      allow update: if isValidId(disputeId) && isVerifiedUser() && isValidDispute(incoming()) &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isAdmin() ||
+          (existing().providerId == request.auth.uid &&
+           incoming().diff(existing()).affectedKeys().hasOnly(['providerResponse', 'updatedAt']))
+        );
+      allow delete: if isValidId(disputeId) && isAdmin();
+    }
+
+    // Platform Settings
+    match /platform_settings/{settingId} {
+      allow get: if isValidId(settingId);
+      allow list: if true;
+      allow create, update: if isValidId(settingId) && isAdmin() &&
+        isValidPlatformSettings(incoming()) && incoming().updatedAt == request.time;
+      allow delete: if isValidId(settingId) && isAdmin();
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if isValidId(logId) && isAdmin() && isValidAuditLog(incoming()) &&
+        incoming().actorUid == request.auth.uid &&
+        incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // Newsletter subscribers
+    match /newsletter_subscribers/{subId} {
+      allow get, list, delete: if isAdmin();
+      allow create: if isValidId(subId) &&
+        incoming().keys().hasAll(['email', 'createdAt']) &&
+        incoming().keys().hasOnly(['email', 'createdAt']) &&
+        isStringWithRange(incoming().email, 4, 254) &&
+        incoming().createdAt == request.time;
+    }
+
+    // Contact inquiries
+    match /contact_messages/{msgId} {
+      allow get, list, delete: if isAdmin();
+      allow create: if isValidId(msgId) &&
+        incoming().keys().hasAll(['name', 'email', 'subject', 'message', 'createdAt']) &&
+        incoming().keys().hasOnly(['name', 'email', 'subject', 'message', 'createdAt']) &&
+        isStringWithRange(incoming().name, 1, 120) &&
+        isStringWithRange(incoming().email, 4, 254) &&
+        isStringWithRange(incoming().subject, 2, 160) &&
+        isStringWithRange(incoming().message, 10, 2000) &&
+        incoming().createdAt == request.time;
+    }
+  }
+}

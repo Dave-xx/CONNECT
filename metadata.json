@@ -1,0 +1,6 @@
+{
+  "name": "ServiceConnect",
+  "description": "Find Trusted Professionals. Get Things Done. A production-ready local services marketplace connecting customers, verified service providers, and administrators across Kenya and Africa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

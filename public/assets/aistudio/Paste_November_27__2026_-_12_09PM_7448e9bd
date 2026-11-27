@@ -1,0 +1,1670 @@
+# MASTER DEVELOPMENT PROMPT: SERVICECONNECT
+## Build a Premium, AI-Enhanced Local Services Marketplace
+
+# 1. YOUR ROLE
+
+Act as a world-class product development team comprising:
+
+- Senior SaaS product architect.
+- Senior full-stack software engineer.
+- Expert UI/UX designer.
+- Marketplace business strategist.
+- Database architect.
+- AI integration engineer.
+- Cybersecurity specialist.
+- Quality assurance engineer.
+
+Your mission is to build a complete, scalable, production-ready local services marketplace called **ServiceConnect**.
+
+Do not build a simple website, static prototype, landing page or non-functional demonstration.
+
+Build a real, working application with customer accounts, professional service-provider accounts, booking functionality, a database, an administrative dashboard, payments readiness, notifications and a polished user experience.
+
+The platform must be designed to scale from Kenya to other African countries and eventually international markets.
+
+The product should combine the best usability principles of Airbnb, Uber, Thumbtack and modern premium SaaS platforms, while maintaining its own original identity.
+
+# 2. PRODUCT VISION
+
+Brand name: ServiceConnect
+
+Tagline: Find Trusted Professionals. Get Things Done.
+
+Mission:
+
+Make it easy for anyone to find, compare, book and work with reliable service professionals.
+
+The platform connects three main groups:
+
+1. Customers looking for services.
+2. Service providers offering professional services.
+3. Administrators managing and supervising the marketplace.
+
+Core marketplace workflow:
+
+Customer needs a service → Searches or describes the problem → Discovers relevant professionals → Compares profiles and prices → Requests a quote or books → Receives confirmation → Service is completed → Customer reviews the provider.
+
+Service providers should be able to manage their businesses through their own dashboards.
+
+Administrators should have complete visibility and control over marketplace operations.
+
+# 3. TARGET MARKET
+
+Initial launch: Kenya.
+
+Initial cities:
+- Nairobi.
+- Mombasa.
+- Kisumu.
+- Nakuru.
+- Eldoret.
+- Other supported towns as the marketplace expands.
+
+Future expansion:
+- Uganda.
+- Tanzania.
+- Rwanda.
+- Ghana.
+- Nigeria.
+- Other African markets.
+- International markets.
+
+Use configurable country, city, currency, language and timezone settings.
+
+Default currency: KSh.
+
+Default timezone: Africa/Nairobi.
+
+Support local phone numbers and international phone formats.
+
+# 4. BRAND IDENTITY AND DESIGN SYSTEM
+
+Create an elegant, modern, trustworthy and premium visual identity.
+
+The platform should look like a serious technology company, not a generic classified advertisements website.
+
+## Colour palette
+
+Primary:
+- Deep Navy: #132238
+- Dark Navy: #0D1B2A
+- Primary Teal: #0D9488
+- Teal Light: #E6F6F3
+
+Secondary:
+- Blue: #3977D5
+- Light Blue: #EFF5FF
+- Warm Coral: #F28B72
+
+Neutral:
+- Background: #F7F9FC
+- White: #FFFFFF
+- Primary Text: #182230
+- Secondary Text: #667085
+- Muted Text: #98A2B3
+- Borders: #E6EAF0
+
+Functional:
+- Success: #16A36A
+- Warning: #E9A23B
+- Danger: #DC5353
+
+Colour usage:
+- Navy establishes trust and professionalism.
+- Teal is the main brand and action colour.
+- Blue supports information and secondary actions.
+- Coral is used sparingly for highlights.
+- Green indicates successful bookings and verification.
+- Red is reserved for errors and critical alerts.
+
+Avoid excessive gradients, excessive shadows and unnecessary decoration.
+
+## Typography
+
+Use Inter as the main font.
+
+Use a clear hierarchy:
+- Hero headings: 42–56px desktop.
+- Page headings: 28–34px.
+- Section headings: 20–24px.
+- Card titles: 16–18px.
+- Body text: 14–16px.
+- Supporting labels: 12–13px.
+
+Maintain excellent readability.
+
+## Layout
+
+Use:
+- A consistent spacing system based on 4px.
+- Rounded cards with 12–16px radii.
+- Buttons with 8–10px radii.
+- Subtle shadows.
+- Thin borders.
+- Generous whitespace.
+- Clear visual hierarchy.
+
+Use Lucide icons consistently.
+
+## Animations
+
+Implement:
+- Smooth page transitions.
+- Subtle card hover effects.
+- Animated dropdown menus.
+- Elegant modal transitions.
+- Loading skeletons.
+- Smooth button feedback.
+- Booking progress animations.
+- Subtle success animations.
+
+Most transitions should last 150–250ms.
+
+Respect reduced-motion preferences.
+
+# 5. APPLICATION ARCHITECTURE
+
+Create three connected experiences within one application.
+
+A. CUSTOMER APPLICATION
+For people looking for services.
+
+B. SERVICE PROVIDER APPLICATION
+For professionals and businesses offering services.
+
+C. ADMINISTRATOR APPLICATION
+For platform owners and authorized staff.
+
+Use role-based routing and authorization.
+
+Suggested routes:
+
+PUBLIC:
+- /
+- /services
+- /services/:category
+- /providers/:slug
+- /how-it-works
+- /become-a-provider
+- /about
+- /contact
+- /help
+- /login
+- /register
+
+CUSTOMER:
+- /app/dashboard
+- /app/discover
+- /app/bookings
+- /app/favorites
+- /app/messages
+- /app/reviews
+- /app/profile
+- /app/settings
+
+PROVIDER:
+- /provider/dashboard
+- /provider/profile
+- /provider/services
+- /provider/bookings
+- /provider/quotes
+- /provider/messages
+- /provider/earnings
+- /provider/reviews
+- /provider/availability
+- /provider/settings
+
+ADMIN:
+- /admin/dashboard
+- /admin/users
+- /admin/providers
+- /admin/verifications
+- /admin/categories
+- /admin/bookings
+- /admin/payments
+- /admin/reviews
+- /admin/disputes
+- /admin/reports
+- /admin/settings
+
+Protect all private routes.
+
+Do not rely on frontend route hiding as a security mechanism.
+
+# 6. PUBLIC LANDING PAGE
+
+Create a premium, conversion-focused landing page.
+
+The landing page is extremely important because it is the first interaction with the brand.
+
+## Navigation bar
+
+Include:
+- ServiceConnect logo.
+- Home.
+- Explore Services.
+- How It Works.
+- Become a Provider.
+- About.
+- Help.
+- Login.
+- Get Started.
+
+The navigation should be clean and responsive.
+
+## Hero section
+
+Use a visually attractive hero section.
+
+Main headline:
+
+"Find the Right Professional. Get the Job Done."
+
+Supporting text:
+
+"Discover trusted local professionals for your home, business and everyday needs. Compare, connect and book with confidence."
+
+Include a prominent search component.
+
+Search fields:
+- What service do you need?
+- Where do you need it?
+- Search button.
+
+Example search placeholder:
+
+"Try plumber, electrician, cleaner or mechanic..."
+
+Location placeholder:
+
+"Enter your location or choose your area."
+
+Include suggested popular searches.
+
+Use high-quality, authentic images of professionals performing real services.
+
+Avoid unrealistic stock imagery or generic AI illustrations.
+
+## Trust indicators
+
+Display genuine platform statistics when available:
+- Verified professionals.
+- Completed bookings.
+- Customer satisfaction.
+- Cities served.
+
+Do not invent statistics.
+
+Hide statistics until real data exists.
+
+## Popular service categories
+
+Create attractive category cards with illustrations or quality images.
+
+Initial categories:
+
+1. Plumbing.
+2. Electrical Services.
+3. Cleaning Services.
+4. Home Repairs.
+5. Painting.
+6. Carpentry.
+7. Appliance Repair.
+8. Moving and Relocation.
+9. Gardening and Landscaping.
+10. Pest Control.
+11. Automotive Services.
+12. Beauty and Personal Care.
+13. Computer and IT Support.
+14. Photography and Events.
+15. Construction and Renovation.
+16. Laundry Services.
+
+Allow administrators to create, edit, reorder and deactivate categories.
+
+## Featured professionals
+
+Show professional cards containing:
+- Profile photograph.
+- Business or professional name.
+- Verification badge.
+- Service category.
+- Location.
+- Average rating.
+- Number of reviews.
+- Starting price where available.
+- Short description.
+- View Profile button.
+- Book Now or Request Quote button.
+
+Only show verified providers in prominently promoted verified sections.
+
+## How it works
+
+Show three simple steps:
+
+1. Find a professional.
+2. Compare and book.
+3. Get the job done.
+
+## Other landing-page sections
+
+Include:
+- Popular services near you.
+- Top-rated professionals.
+- How ServiceConnect protects customers.
+- Customer testimonials, only when genuine.
+- Become a professional.
+- Frequently asked questions.
+- Newsletter signup.
+- Footer with legal and support links.
+
+# 7. CUSTOMER REGISTRATION AND ONBOARDING
+
+Create an elegant registration and authentication experience.
+
+Support:
+- Email registration.
+- Password login.
+- Password reset.
+- Email verification.
+- Phone verification readiness.
+- Social login readiness.
+- Secure session management.
+
+Customer profile fields:
+- Full name.
+- Email.
+- Phone number.
+- Profile picture.
+- Preferred location.
+- Saved addresses.
+- Account preferences.
+
+After registration, guide customers through a short onboarding process.
+
+Ask for:
+- Name.
+- Phone number.
+- General location.
+- Service preferences.
+
+Do not force users to provide unnecessary information before exploring the platform.
+
+# 8. SERVICE DISCOVERY AND SEARCH
+
+This is one of the most important components.
+
+Build an intelligent service discovery engine.
+
+Customers must be able to find professionals easily.
+
+## Search functionality
+
+Allow searching by:
+- Service name.
+- Service category.
+- Professional name.
+- Business name.
+- Location.
+- Keywords.
+- Service description.
+
+Search examples:
+- Plumber in Westlands.
+- Electrician near Kilimani.
+- House cleaner in Nairobi.
+- Laptop repair near me.
+- Professional painter.
+
+Implement:
+- Search autocomplete.
+- Suggested categories.
+- Recent searches.
+- Popular searches.
+- Typo-tolerant search where feasible.
+
+## Search filters
+
+Include:
+- Location.
+- Distance.
+- Service category.
+- Price range.
+- Minimum rating.
+- Verified providers only.
+- Available today.
+- Available this week.
+- Emergency availability.
+- Individual professionals or registered businesses.
+
+## Sorting
+
+Allow sorting by:
+- Relevance.
+- Highest rated.
+- Most reviewed.
+- Price: lowest first.
+- Price: highest first.
+- Nearest.
+- Earliest availability.
+
+## Search result layout
+
+Provide both:
+- Grid view.
+- List view.
+
+Each professional card should have:
+- Professional photograph.
+- Name.
+- Verification status.
+- Rating.
+- Review count.
+- Service category.
+- Location.
+- Starting price.
+- Availability indicator.
+- Profile button.
+
+Include pagination or efficient infinite loading.
+
+Never fabricate reviews, ratings, availability or distances.
+
+# 9. PROFESSIONAL PROFILE PAGES
+
+Every provider must have a dedicated public profile.
+
+Profile information:
+
+- Profile photo or business logo.
+- Professional name.
+- Business name where applicable.
+- Verification status.
+- Professional biography.
+- Years of experience.
+- Service categories.
+- Service areas.
+- Languages.
+- Working hours.
+- Gallery of completed projects.
+- Qualifications and certifications.
+- Customer reviews.
+- Price information.
+- Booking availability.
+
+Include clear action buttons:
+
+- Request a Quote.
+- Book a Service.
+- Contact Provider.
+- Save to Favorites.
+
+## Portfolio
+
+Allow providers to upload:
+- Before-and-after images.
+- Completed project images.
+- Work samples.
+- Relevant certificates.
+
+Validate file types and sizes.
+
+Protect uploaded files through appropriate storage access policies.
+
+## Trust features
+
+Display:
+- Identity verified.
+- Phone verified.
+- Business verified where applicable.
+- Professional credentials verified where applicable.
+
+Make it clear what each verification badge actually means.
+
+Do not claim that a professional is licensed unless their relevant credentials have been checked.
+
+# 10. SERVICE PROVIDER REGISTRATION
+
+Build a separate onboarding experience for professionals.
+
+Main CTA:
+
+"Grow Your Business with ServiceConnect."
+
+Registration fields:
+
+Personal information:
+- Full name.
+- Email.
+- Phone number.
+- Password.
+
+Business information:
+- Business name.
+- Business type.
+- Business description.
+- Location.
+- Service areas.
+- Business registration details where applicable.
+
+Professional information:
+- Services offered.
+- Experience.
+- Qualifications.
+- Certifications.
+- Languages.
+- Portfolio images.
+
+Verification information:
+- Identity document.
+- Phone verification.
+- Business documents where applicable.
+- Professional certificates where relevant.
+
+Provide a clear verification progress indicator.
+
+Provider verification statuses:
+- Not submitted.
+- Pending review.
+- Approved.
+- Rejected.
+- Additional information required.
+- Suspended.
+
+Do not automatically approve identity or professional documents.
+
+Require authorized administrator review.
+
+Providers should be able to save incomplete onboarding and continue later.
+
+# 11. PROVIDER DASHBOARD
+
+Build a premium professional dashboard.
+
+The dashboard should help providers manage their businesses.
+
+Greeting:
+
+"Welcome back, [Provider Name]."
+
+Show:
+
+KPI cards:
+- New Booking Requests.
+- Confirmed Bookings.
+- Completed Jobs.
+- Total Earnings.
+
+Other sections:
+
+A. Booking requests
+
+Show:
+- Customer name.
+- Requested service.
+- Requested date.
+- Location.
+- Booking status.
+- Request time.
+
+Actions:
+- Accept.
+- Decline.
+- Request more information.
+- Submit quotation.
+
+B. Upcoming bookings
+
+Show:
+- Customer.
+- Service.
+- Date.
+- Time.
+- Location.
+- Booking status.
+
+C. Earnings overview
+
+Show:
+- Total earnings.
+- Pending payments.
+- Completed payments.
+- Platform fees where applicable.
+
+D. Reviews and ratings
+
+Display:
+- Average rating.
+- Total reviews.
+- Recent customer feedback.
+
+E. Performance analytics
+
+Display:
+- Profile views.
+- Search appearances.
+- Booking conversion.
+- Completed jobs.
+
+Only calculate performance metrics using actual recorded events.
+
+# 12. SERVICE MANAGEMENT
+
+Allow providers to create and manage service listings.
+
+Service fields:
+- Service title.
+- Category.
+- Description.
+- Images.
+- Price.
+- Pricing model.
+- Estimated duration.
+- Service locations.
+- Availability.
+- Terms and conditions.
+
+Pricing models:
+- Fixed price.
+- Starting price.
+- Hourly rate.
+- Per-unit pricing.
+- Custom quotation.
+
+Examples:
+- Plumbing inspection: KSh 1,000.
+- House cleaning: Starting at KSh 2,500.
+- Electrical installation: Request a quotation.
+
+Allow providers to:
+- Add services.
+- Edit services.
+- Pause services.
+- Archive services.
+- Update prices.
+- Manage availability.
+
+All listings should be subject to platform rules and moderation.
+
+# 13. BOOKING AND QUOTATION SYSTEM
+
+This is the central transaction workflow.
+
+Build a complete booking engine.
+
+Support two booking methods:
+
+A. DIRECT BOOKING
+
+For providers who offer predefined services at known prices.
+
+B. REQUEST A QUOTE
+
+For jobs requiring inspection or custom pricing.
+
+## Customer booking workflow
+
+Step 1: Select service.
+
+Step 2: Choose provider.
+
+Step 3: Describe the job.
+
+Step 4: Upload relevant photographs if necessary.
+
+Step 5: Select location.
+
+Step 6: Choose preferred date and time.
+
+Step 7: Review pricing or request a quotation.
+
+Step 8: Submit booking request.
+
+Step 9: Receive confirmation or provider response.
+
+Step 10: Track booking progress.
+
+## Booking information
+
+Store:
+- Booking reference.
+- Customer.
+- Provider.
+- Service.
+- Job description.
+- Location.
+- Scheduled date.
+- Scheduled time.
+- Price.
+- Payment status.
+- Booking status.
+- Communication history.
+
+Booking statuses:
+- Requested.
+- Awaiting quotation.
+- Quotation sent.
+- Awaiting customer approval.
+- Confirmed.
+- Provider en route.
+- In progress.
+- Completed.
+- Cancelled.
+- Disputed.
+
+Implement valid state transitions.
+
+Do not allow unauthorized users to change booking status.
+
+## Provider quotation workflow
+
+Providers should be able to:
+- View quote requests.
+- Ask clarifying questions.
+- Submit prices.
+- Specify what is included.
+- Specify estimated completion time.
+- Set quotation expiry.
+- Send quotations.
+
+Customers should be able to:
+- Review quotations.
+- Compare quotations.
+- Accept a quotation.
+- Decline a quotation.
+- Request clarification.
+
+When a quotation is accepted, create or update the associated booking appropriately.
+
+Prevent duplicate bookings caused by repeated submissions.
+
+# 14. AVAILABILITY AND SCHEDULING
+
+Create a professional availability management system.
+
+Providers can configure:
+- Working days.
+- Opening times.
+- Closing times.
+- Break times.
+- Days off.
+- Holidays.
+- Maximum bookings per day.
+- Booking lead time.
+- Service duration.
+- Emergency availability.
+
+Use a calendar interface.
+
+Customers should only be offered available time slots based on the provider's actual availability and existing bookings.
+
+Prevent overlapping confirmed bookings where provider capacity is one.
+
+Support configurable booking durations and buffer periods.
+
+Store timestamps consistently and display them in the appropriate local timezone.
+
+# 15. MESSAGING AND COMMUNICATION
+
+Build an internal messaging system.
+
+Customers and providers should be able to communicate about bookings.
+
+Features:
+- One-to-one messaging.
+- Booking-linked conversations.
+- Text messages.
+- Image attachments.
+- Read indicators.
+- Message timestamps.
+- Unread message counters.
+- Conversation history.
+
+Only authorized participants should access a booking conversation.
+
+Prepare for:
+- Email notifications.
+- SMS.
+- WhatsApp Business integration.
+- Push notifications.
+
+Do not expose personal contact information unnecessarily.
+
+# 16. CUSTOMER DASHBOARD
+
+Build a clean customer dashboard.
+
+Main sections:
+
+Overview:
+- Upcoming bookings.
+- Active jobs.
+- Completed jobs.
+- Pending quotations.
+
+My Bookings:
+- All bookings.
+- Booking details.
+- Status tracking.
+- Cancellation requests.
+
+Saved Professionals:
+- Favorite providers.
+- Saved services.
+
+Messages:
+- Conversations.
+- Unread messages.
+
+Reviews:
+- Completed jobs awaiting reviews.
+- Previously submitted reviews.
+
+Profile:
+- Personal information.
+- Addresses.
+- Preferences.
+- Security settings.
+
+The customer should be able to manage their entire experience from this dashboard.
+
+# 17. REVIEWS AND RATINGS
+
+Build a trustworthy review system.
+
+Only customers with eligible completed bookings should be able to submit verified booking reviews.
+
+Review fields:
+- Overall rating from 1 to 5.
+- Professionalism.
+- Quality of work.
+- Punctuality.
+- Communication.
+- Written feedback.
+- Optional images.
+
+Allow:
+- Provider responses.
+- Customer review editing within a defined policy.
+- Reporting inappropriate reviews.
+- Administrator moderation.
+
+Prevent:
+- Duplicate reviews for the same booking.
+- Self-reviews.
+- Unauthorized review creation.
+- Fake review manipulation.
+
+Calculate average ratings using verified eligible reviews.
+
+Clearly distinguish verified booking reviews from other feedback, if any are later introduced.
+
+# 18. LOCATION AND MAP INTEGRATION
+
+Location is central to the marketplace.
+
+Implement location-aware discovery.
+
+Features:
+- Search by town, city and neighborhood.
+- Use current location only after permission.
+- Save customer addresses.
+- Display provider service areas.
+- Show approximate distance when reliable coordinates are available.
+- Display nearby professionals on a map.
+- Allow customers to select a service location.
+
+Prepare integration with:
+- Google Maps or Mapbox.
+- Geocoding.
+- Distance calculations.
+- Route information.
+
+Do not expose a customer's precise address publicly.
+
+Only share the exact job address with the authorized provider when required for an accepted booking.
+
+If map credentials are unavailable, provide a working location-based search using stored city and neighborhood fields rather than a broken map.
+
+# 19. PAYMENTS AND MONETIZATION
+
+Build a secure, payment-ready architecture.
+
+Initial market: Kenya.
+
+Preferred payment method:
+- M-Pesa.
+
+Additional payment methods:
+- Card payments.
+- Bank transfer.
+- Other configurable methods.
+
+Prepare integration with the official M-Pesa Daraja API or a suitable licensed payment provider.
+
+Payment features:
+- Booking payment.
+- Deposits.
+- Full payment.
+- Payment confirmation.
+- Transaction history.
+- Refund records.
+- Provider payout records.
+- Platform commission calculations.
+
+Do not store raw card details.
+
+Do not mark payments as successful based only on a frontend response.
+
+Verify payment status through secure server-side provider callbacks or official verification APIs.
+
+Do not claim that M-Pesa is live until actual credentials, callbacks and end-to-end tests have been completed.
+
+## Revenue model
+
+Design the platform for several possible revenue streams:
+
+1. Booking commission.
+2. Provider subscription plans.
+3. Featured provider placements.
+4. Promoted service listings.
+5. Premium provider analytics.
+
+Create configurable commission rates.
+
+Example subscription structure:
+
+FREE:
+- Basic provider profile.
+- Limited service listings.
+- Basic booking management.
+
+PRO:
+- More service listings.
+- Enhanced profile.
+- Advanced analytics.
+- More promotional visibility.
+
+BUSINESS:
+- Multiple staff accounts.
+- Advanced business analytics.
+- Priority support.
+- Additional business tools.
+
+Do not hardcode commercial prices or commission rates.
+
+Allow administrators to configure them.
+
+Important: Featured listings must be clearly identified as sponsored. Paid promotion must not override safety or verification rules.
+
+Initially, payments can be handled outside the platform while the marketplace validates demand. Implement online payments in a controlled later phase.
+
+Do not build an unlicensed escrow or wallet system.
+
+# 20. AI FEATURES — SERVICECONNECT INTELLIGENCE
+
+Build an AI-powered assistance layer.
+
+AI should enhance the marketplace, not replace the core search and booking functionality.
+
+## Customer AI assistant
+
+Allow customers to describe what they need in ordinary language.
+
+Example:
+
+"My kitchen sink is leaking and I need someone in Westlands today."
+
+The AI should:
+- Understand the requested service.
+- Identify relevant categories.
+- Extract the location.
+- Ask clarifying questions if needed.
+- Recommend relevant search filters.
+- Display matching available providers.
+
+The AI must use actual marketplace data.
+
+It must not invent providers, prices, ratings or availability.
+
+## Smart search
+
+Implement AI-assisted intent recognition.
+
+Examples:
+- "My fridge has stopped cooling."
+- "I need someone to paint a two-bedroom apartment."
+- "I need an electrician to install security lights."
+
+Map these requests to appropriate service categories and keywords.
+
+## Provider AI assistant
+
+Help providers:
+- Improve service descriptions.
+- Write professional profile biographies.
+- Draft quotations.
+- Generate customer response suggestions.
+- Understand booking performance.
+- Identify opportunities to improve their listings.
+
+## AI quotation assistance
+
+Allow AI to help organize customer requirements into structured quotation information.
+
+The provider must approve final prices and quotations.
+
+## AI trust and safety
+
+Prepare systems for identifying:
+- Suspicious listings.
+- Repeated spam.
+- Potential fraudulent activity.
+- Abusive messages.
+- Suspicious review patterns.
+
+AI flags must be reviewed through appropriate moderation procedures.
+
+Do not automatically accuse or permanently suspend users based solely on AI predictions.
+
+## AI implementation rules
+
+Use secure server-side LLM integration.
+
+Do not expose API keys.
+
+Do not allow AI to directly access arbitrary database queries.
+
+Use controlled backend tools.
+
+Require explicit confirmation before AI initiates a booking or any financial transaction.
+
+Provide graceful fallback if AI services are unavailable.
+
+# 21. ADMINISTRATOR DASHBOARD
+
+This is essential.
+
+Build a powerful administrative control center.
+
+Only authorized administrator accounts can access it.
+
+## Admin overview
+
+Display:
+- Total registered customers.
+- Total registered providers.
+- Verified providers.
+- Pending verification applications.
+- Total bookings.
+- Completed bookings.
+- Cancelled bookings.
+- Platform revenue.
+- Pending disputes.
+- New registrations.
+
+Include:
+- Booking trends.
+- Revenue charts.
+- Service category performance.
+- Provider activity.
+- Geographic performance.
+
+All statistics must be calculated from real records.
+
+## User management
+
+Administrators can:
+- View users.
+- Search users.
+- Filter accounts.
+- View profiles.
+- Suspend accounts.
+- Restore accounts.
+- Manage permissions.
+- Investigate reported accounts.
+
+## Provider verification management
+
+Administrators can:
+- Review submitted documents.
+- View verification information.
+- Approve applications.
+- Reject applications with reasons.
+- Request additional information.
+- Suspend verified providers when necessary.
+
+Maintain a verification audit trail.
+
+## Category management
+
+Administrators can:
+- Add categories.
+- Edit categories.
+- Upload category images.
+- Reorder categories.
+- Create subcategories.
+- Deactivate categories.
+
+## Booking management
+
+Administrators can:
+- View all bookings.
+- Search booking references.
+- Filter by status.
+- Investigate issues.
+- Review booking history.
+- Process permitted administrative actions.
+
+## Review moderation
+
+Administrators can:
+- Review reported feedback.
+- Remove content that violates policies.
+- Investigate suspicious activity.
+- Maintain moderation records.
+
+## Dispute management
+
+Create a dispute management system.
+
+Allow:
+- Customers to report service issues.
+- Providers to respond.
+- Evidence attachment.
+- Administrator review.
+- Resolution notes.
+- Case status tracking.
+
+Statuses:
+- Open.
+- Under investigation.
+- Awaiting response.
+- Resolved.
+- Closed.
+
+Maintain records of every important administrative action.
+
+## Platform configuration
+
+Allow administrators to configure:
+- Platform commission.
+- Provider plans.
+- Categories.
+- Supported cities.
+- Supported currencies.
+- Notification settings.
+- Verification requirements.
+- Booking policies.
+- Cancellation policies.
+
+# 22. NOTIFICATIONS
+
+Create a centralized notification system.
+
+Customer notifications:
+- Booking submitted.
+- Provider accepted.
+- Quotation received.
+- Booking confirmed.
+- Provider arriving.
+- Service completed.
+- Payment confirmation.
+- Review reminder.
+
+Provider notifications:
+- New booking request.
+- New quotation request.
+- New customer message.
+- Booking confirmed.
+- Booking cancelled.
+- New review.
+- Verification status update.
+- Payment or payout update.
+
+Administrator notifications:
+- New verification application.
+- Reported user.
+- Dispute submitted.
+- Suspicious activity.
+- Important payment failures.
+
+Support:
+- In-app notifications.
+- Email integration.
+- SMS integration readiness.
+- WhatsApp integration readiness.
+- Push notification readiness.
+
+Users must be able to configure notification preferences.
+
+Avoid duplicate notifications.
+
+# 23. SECURITY AND PRIVACY
+
+Security must be implemented from the beginning.
+
+Requirements:
+- Secure authentication.
+- Role-based access control.
+- Row Level Security.
+- Server-side permission checks.
+- Secure file storage.
+- Input validation.
+- API rate limiting.
+- Secure session management.
+- Protection against common web attacks.
+- Audit logs.
+- Payment verification.
+- Secure secrets management.
+
+Enforce data separation between customers, providers and administrators.
+
+Customers must not access other customers' private information.
+
+Providers must only access their own listings and authorized booking information.
+
+Administrators must have explicitly granted permissions.
+
+Protect:
+- Personal identity documents.
+- Phone numbers.
+- Private messages.
+- Customer addresses.
+- Payment records.
+
+Follow Kenya's Data Protection Act and applicable international privacy requirements.
+
+Include privacy policy, terms of service, consent management and account deletion procedures.
+
+# 24. DATABASE ARCHITECTURE
+
+Use Supabase with PostgreSQL.
+
+Design a normalized relational database.
+
+Suggested tables:
+
+IDENTITY:
+- profiles
+- user_roles
+- user_addresses
+- user_preferences
+
+MARKETPLACE:
+- businesses
+- provider_profiles
+- provider_verifications
+- provider_documents
+- provider_service_areas
+- service_categories
+- services
+- service_images
+- provider_availability
+- provider_time_off
+
+BOOKINGS:
+- bookings
+- booking_items
+- quotations
+- quotation_items
+- booking_status_history
+- booking_attachments
+
+COMMUNICATION:
+- conversations
+- conversation_participants
+- messages
+- message_attachments
+- notifications
+
+REVIEWS:
+- reviews
+- review_responses
+- review_reports
+
+PAYMENTS:
+- payments
+- refunds
+- provider_payouts
+- platform_commissions
+- payment_webhook_events
+
+ADMINISTRATION:
+- disputes
+- dispute_evidence
+- audit_logs
+- moderation_reports
+- platform_settings
+
+SUBSCRIPTIONS:
+- subscription_plans
+- subscriptions
+- subscription_transactions
+
+AI:
+- ai_conversations
+- ai_messages
+- ai_usage_records
+
+Use:
+- UUID primary keys.
+- Foreign key constraints.
+- Appropriate database indexes.
+- Created and updated timestamps.
+- Soft deletion where appropriate.
+- Validated database constraints.
+- Transactional operations.
+
+Implement Row Level Security for every sensitive table.
+
+Ensure that user identity and ownership are derived from authenticated sessions, not trusted from arbitrary frontend input.
+
+# 25. TECHNICAL STACK
+
+Preferred technologies:
+
+Frontend:
+- React.
+- TypeScript.
+- Vite where appropriate.
+- Tailwind CSS.
+- shadcn/ui.
+- Lucide icons.
+
+Backend:
+- Supabase.
+- PostgreSQL.
+- Supabase Authentication.
+- Supabase Storage.
+- Secure server-side functions.
+
+AI:
+- Suitable LLM API.
+- Structured outputs.
+- Secure tool calling.
+
+Maps:
+- Google Maps or Mapbox.
+
+Payments:
+- M-Pesa Daraja API.
+- Suitable payment gateway integrations.
+
+Forms:
+- React Hook Form.
+- Zod.
+
+Charts:
+- Recharts.
+
+Use compatible, stable dependencies supported by the Bolt.new environment.
+
+If the environment already uses a working framework, inspect it before changing architecture.
+
+Avoid unnecessary dependencies.
+
+# 26. RESPONSIVE DESIGN
+
+The entire application must work on:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Android smartphones.
+- iPhones.
+
+Mobile-first requirements:
+
+Customer:
+- Easy service search.
+- Bottom navigation.
+- Clear booking process.
+- Large touch targets.
+- Easy profile access.
+
+Provider:
+- Mobile booking management.
+- Fast quotation submission.
+- Easy messaging.
+- Simple availability controls.
+
+Admin:
+- Responsive dashboards.
+- Readable tables.
+- Mobile-friendly management actions.
+
+Never allow horizontal overflow.
+
+Use optimized images and efficient loading.
+
+# 27. LOW CONNECTIVITY AND PERFORMANCE
+
+Consider users with slower internet connections.
+
+Implement:
+- Optimized images.
+- Lazy loading.
+- Efficient pagination.
+- Search debouncing.
+- Efficient database queries.
+- Loading skeletons.
+- Graceful error handling.
+- Retry mechanisms.
+- Persistent booking drafts where appropriate.
+
+Prepare for progressive web app functionality.
+
+Do not pretend a booking has been submitted if the server has not confirmed it.
+
+Show the correct transaction state.
+
+# 28. TESTING AND QUALITY ASSURANCE
+
+Test all major workflows.
+
+CUSTOMER TESTS:
+- Registration.
+- Login.
+- Service search.
+- Search filters.
+- Provider profile.
+- Booking request.
+- Quotation acceptance.
+- Messaging.
+- Cancellation.
+- Review submission.
+
+PROVIDER TESTS:
+- Registration.
+- Verification submission.
+- Service creation.
+- Availability management.
+- Booking acceptance.
+- Quotation submission.
+- Booking completion.
+- Customer communication.
+
+ADMIN TESTS:
+- User management.
+- Provider verification.
+- Category management.
+- Booking management.
+- Dispute management.
+- Review moderation.
+
+SECURITY TESTS:
+- Unauthorized access.
+- Cross-account data access.
+- Role escalation.
+- File access restrictions.
+- Payment verification.
+- Duplicate transactions.
+
+Test responsive layouts and important user flows.
+
+# 29. DEVELOPMENT ROADMAP
+
+Do not try to build every feature in one untested operation.
+
+Implement in controlled phases.
+
+PHASE 1 — PRODUCT FOUNDATION
+- Project setup.
+- Branding.
+- Design system.
+- Public landing page.
+- Authentication.
+- Customer onboarding.
+- Provider onboarding.
+- Database setup.
+- Role-based permissions.
+
+PHASE 2 — MARKETPLACE CORE
+- Service categories.
+- Provider profiles.
+- Service listings.
+- Search.
+- Filters.
+- Location-based discovery.
+- Provider verification.
+
+PHASE 3 — TRANSACTIONS
+- Booking system.
+- Quotation system.
+- Availability calendar.
+- Booking status tracking.
+- Customer dashboard.
+- Provider dashboard.
+
+PHASE 4 — COMMUNICATION AND TRUST
+- Messaging.
+- Notifications.
+- Reviews.
+- Favorites.
+- Disputes.
+- Moderation.
+
+PHASE 5 — ADMINISTRATION
+- Admin dashboard.
+- User management.
+- Provider verification.
+- Category management.
+- Booking management.
+- Analytics.
+
+PHASE 6 — INTELLIGENCE AND MONETIZATION
+- AI search.
+- AI assistants.
+- Provider subscriptions.
+- Commission calculations.
+- Payment integration.
+- M-Pesa integration.
+
+PHASE 7 — PRODUCTION READINESS
+- Testing.
+- Security review.
+- Performance optimization.
+- Deployment.
+- Monitoring.
+- Documentation.
+
+Prioritize a working end-to-end marketplace before introducing advanced AI or complicated monetization.
+
+# 30. IMPORTANT DEVELOPMENT RULES FOR BOLT.NEW
+
+Follow these rules throughout development:
+
+1. First inspect the existing project and its dependencies.
+2. Do not unnecessarily overwrite working code.
+3. Establish a maintainable project structure.
+4. Use reusable components.
+5. Use TypeScript consistently.
+6. Connect real database operations.
+7. Never rely on hardcoded users or fake bookings in production.
+8. Do not build buttons that do nothing.
+9. Every form must have validation.
+10. Every major action must have loading, success and error states.
+11. Protect all private routes.
+12. Implement server-side authorization.
+13. Use secure environment variables.
+14. Do not expose API keys.
+15. Do not fabricate verification badges.
+16. Do not fabricate provider reviews.
+17. Do not fabricate payment confirmations.
+18. Do not fabricate booking availability.
+19. Do not claim integrations work before testing them.
+20. Document integrations that need external credentials.
+
+If credentials are missing, create a clear integration configuration and explain the remaining setup steps.
+
+If a feature is too complex for the current phase, build the correct foundation and document the remaining work instead of creating a misleading placeholder.
+
+# 31. FINAL PRODUCT QUALITY
+
+The finished application must have:
+
+A premium public website.
+
+A smooth customer experience.
+
+A powerful provider dashboard.
+
+A comprehensive administrator dashboard.
+
+A functional service discovery engine.
+
+A complete booking and quotation workflow.
+
+A secure messaging system.
+
+A trustworthy review system.
+
+A scalable database.
+
+A payment-ready architecture.
+
+AI-powered assistance.
+
+A responsive design.
+
+The result should look and function like a serious commercial technology platform.
+
+# 32. YOUR FIRST EXECUTION TASK
+
+Do not immediately attempt to generate the entire platform.
+
+Start by doing the following:
+
+1. Analyze this complete specification.
+2. Propose the application architecture.
+3. Establish the database schema.
+4. Establish the design system.
+5. Create the project structure.
+6. Build the public landing page.
+7. Implement authentication and role-based onboarding.
+8. Create the customer and provider application shells.
+9. Connect Supabase.
+10. Test registration and authorization.
+
+Then proceed through the development roadmap.
+
+At the end of every phase:
+- Explain what was implemented.
+- Identify which features are functional.
+- Identify which integrations still need credentials.
+- Run relevant tests.
+- Fix errors before proceeding.
+
+Never sacrifice quality for speed.
+
+## FINAL PRODUCT DIRECTIVE
+
+Build ServiceConnect as if it were a technology startup preparing to launch to thousands of customers and professionals.
+
+Every design decision, technical decision and product feature must contribute to one goal:
+
+**Making finding and hiring trusted professionals easier, safer and more convenient.**
+
+Do not stop at the prototype. Build a real, usable, secure and scalable marketplace.
