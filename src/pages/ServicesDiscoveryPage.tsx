@@ -335,7 +335,7 @@ export function ServicesDiscoveryPage({
                     <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-[#667085]">
                       {c.areas.map((area) => (
                         <button
-                          key={area}
+                          key={`${c.city}-${area}`}
                           type="button"
                           onClick={() => setSelectedCity(area)}
                           className={`hover:text-[#0D9488] ${
@@ -433,7 +433,7 @@ export function ServicesDiscoveryPage({
                   className="w-full bg-transparent text-sm focus:outline-none"
                 />
                 <datalist id="filter-city-list">
-                  {KENYA_CITIES.flatMap((c) => [c.city, ...c.areas]).map((loc) => (
+                  {Array.from(new Set(KENYA_CITIES.flatMap((c) => [c.city, ...c.areas]))).map((loc) => (
                     <option key={loc} value={loc} />
                   ))}
                 </datalist>
